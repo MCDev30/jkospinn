@@ -1,102 +1,102 @@
-# JKO-SPINN: Apprentissage de modèles SDE et identification de paramètres physiques avec Score-Based PINNs et JKO
+# JKO-SPINN: Learning SDE models and identifying physical parameters with Score-Based PINNs and JKO
 
 ---
 
-## Aperçu
+## Overview
 
-**JKO-SPINN** est une implémentation moderne d’un algorithme innovant pour l’apprentissage de Systèmes Dynamiques Stochastiques (SDEs) depuis des trajectoires bruitées. Combinant la puissance des réseaux de neurones à score (score-based models), l’intégration de connaissances physiques via des Equation Differentiales Stochastiques (EDS) et des techniques avancées d’optimisation inspirées du schéma de Jordan-Kinderlehrer-Otto (JKO), ce code permet l’inférence jointe:
+**JKO-SPINN** is a modern implementation of an innovative algorithm for learning Stochastic Differential Equations (SDEs) from noisy trajectories. By combining the power of score-based neural networks, physical knowledge integration via Stochastic Differential Equations (SDEs), and advanced optimization techniques inspired by the Jordan-Kinderlehrer-Otto (JKO) scheme, this code enables joint inference of:
 
-- **du champ de drift inconnu (score)**
-- **des paramètres physiques du processus**  
-- **à partir de données partiellement observées et bruitées**
+- **the unknown drift field (score)**
+- **the physical parameters of the process**
+- **from partially observed and noisy data**
 
-L’approche repose sur la résolution d’un problème variationnel motivé mathématiquement, avec, en cœur du modèle, un réseau de neurones physique-informé (PINNs) qui apprend une fonction score ajustant à la fois la data et la physique sous-jacente à l’aide d’opérateurs différentielles (scores, divergences, Hutchinson trace, etc.).
-
----
-
-## Fonctionnalités principales
-
-- Simulateur generique de SDE (Euler-Maruyama)
-- Prise en charge de processus de type Ornstein-Uhlenbeck et double puits ("double-well")
-- Génération automatique de trajectoires de références pour l’évaluation
-- Réseau de neurones score-based avec Fourrier Features et Swish activation
-- Perte hybride combinant:  
-  - **Score Matching** (data-driven)  
-  - **Physique** (PINN, opérateur différentiel résiduel)  
-  - **Guidage L2 sur les vrais paramètres (optionnel)**
-- Optimisation jointe des paramètres réseaux & physiques
-- Résultats entièrement traçables (losses, courbes convergence, erreurs relatives, etc.)
-- Expérimentations pour évaluer la robustesse (sparsité, ablations) et la stabilité (multi-initialisation)
-- Visualisations scientifiques: courbes, barplots, tableaux de synthèse…
+The approach is based on solving a mathematically motivated variational problem, with, at the core of the model, a physics-informed neural network (PINN) that learns a score function adapting both to the data and to the underlying physics using differential operators (scores, divergences, Hutchinson trace, etc.).
 
 ---
 
-## Guide d'utilisation
+## Main Features
 
-### 1. Prérequis
+- Generic SDE simulator (Euler-Maruyama)
+- Support for Ornstein-Uhlenbeck and double-well processes
+- Automatic generation of reference trajectories for evaluation
+- Score-based neural network with Fourier features and Swish activation
+- Hybrid loss combining:  
+  - **Score Matching** (data-driven)
+  - **Physics** (PINN, residual differential operator)
+  - **L2 guidance on true parameters (optional)**
+- Joint optimization of network & physical parameters
+- Fully traceable results (losses, convergence curves, relative errors, etc.)
+- Experiments to assess robustness (sparsity, ablations) and stability (multi-initialization)
+- Scientific visualizations: curves, barplots, summary tables…
+
+---
+
+## User Guide
+
+### 1. Prerequisites
 
 - JAX (`jax`, `jaxlib`)
 - NumPy, Matplotlib, Seaborn, tqdm
 - optax
-- scipy (pour les stats)
+- scipy (for stats)
 
-Tout le code est compatible GPU si JAX l’est sur votre machine.
+All code is GPU-compatible if JAX is available on your machine.
 
-### 2. Structure du code
+### 2. Code Structure
 
-- `Config`: configuration générale des hyperparamètres et expérimentation
-- `OUProcess` & `DoubleWellProcess`: définitions des SDEs jouet
-- `SDESimulator`: simulation SDE générique (Euler-Maruyama)
-- `generate_data`: génération de jeux de données synthétiques bruités
-- `score_network`, `init_network`: architecture du score-based PINN avec features Fourier
-- Opérateurs physiques: drift, divergences, trace (Hutchinson)
-- Fonction de losses: data (DSM), physique (PINN), guidage paramètre
-- Boucle d’entraînement `train_jko_spinn`
-- Visualisations des résultats et analyses
+- `Config`: general configuration of hyperparameters and experiment settings
+- `OUProcess` & `DoubleWellProcess`: toy SDE definitions
+- `SDESimulator`: generic SDE simulation (Euler-Maruyama)
+- `generate_data`: generation of synthetic, noisy datasets
+- `score_network`, `init_network`: score-based PINN architecture with Fourier features
+- Physics operators: drift, divergences, Hutchinson trace
+- Loss functions: data (DSM), physics (PINN), parameter guidance
+- Training loop: `train_jko_spinn`
+- Result visualization and analysis
 
-### 3. Exécution des expériences
+### 3. Running Experiments
 
-Expériences typiques :
+Typical experiments:
 
-- **EXP 1 : Processus d'Ornstein-Uhlenbeck**  
-  *Apprentissage des paramètres θ, μ, σ du processus OU à partir de trajectoires bruitées*
+- **EXP 1: Ornstein-Uhlenbeck Process**  
+  *Learning the θ, μ, σ parameters of the OU process from noisy trajectories*
 
-- **EXP 2 : Processus Double-Puits**  
-  *Inférence du paramètre α et du bruit sur un potentiel double-puits*
+- **EXP 2: Double-Well Process**  
+  *Inferring parameter α and noise of a double-well potential*
 
-- **EXP 3 : Multi-Initialisation & robustesse**  
-  *Exécutions multiples pour évaluer la stabilité et la distribution des erreurs*
+- **EXP 3: Multi-Initialization & robustness**  
+  *Multiple runs to assess stability and error distribution*
 
-Chaque expérience génère des synthèses des performances : erreurs relatives de chaque paramètre, convergence, courbes de loss et visualisations.
+Each experiment generates performance summaries: relative errors for each parameter, convergence, loss curves, and visualizations.
 
-### 4. Résultats et visualisation
+### 4. Results and Visualization
 
-Des fonctions de visualisation dédiées permettent :
+Dedicated visualization functions allow:
 
-- Suivi de la convergence des paramètres physiques
-- Visualisation des courbes de pertes (loss curves)
-- Tableaux de synthèse et barplots d’erreurs relatives (%)
-- Analyses supplémentaires : sparsité des données, ablations du nombre d’échantillons Hutchinson, λ_physics, etc.
-
----
-
-Les paramètres, la génération des jeux de données et le choix du SDE sont complètement configurables via la classe `Config`.
+- Monitoring convergence of physical parameters
+- Visualizing loss curves
+- Summary tables and relative error barplots (%)
+- Additional analyses: data sparsity, ablations on Hutchinson sample count, λ_physics, etc.
 
 ---
 
-## Points clés algorithmique
-
-- Optimisation conjointe PINN & paramètres SDE physiques par descente de gradient (AdamW/Optax)
-- Score-based learning par *denoising score matching* (DSM)
-- Imposition de la physique via opérateur différentiel (JKO-PINN residual)
-- Utilisation du trace de Hutchinson pour efficacité sur la divergence du score
-- Stabilité : early stopping, historique, multi-restarts
+Parameters, data generation, and SDE choice are fully configurable via the `Config` class.
 
 ---
 
-## Auteurs
+## Algorithmic Highlights
 
-Développé par :
+- Joint optimization of PINN & SDE physical parameters by gradient descent (AdamW/Optax)
+- Score-based learning using *denoising score matching* (DSM)
+- Imposing physics through a differential operator (JKO-PINN residual)
+- Use of Hutchinson’s trace for efficient score divergence computation
+- Stability: early stopping, history, multi-restarts
 
-**Charbel MAMLANKOU** & **al.**  
-charbelzeusmamlankou@gmail.com, École Nationale Supérieure de Génie Mathématique et Modélisation
+---
+
+## Authors
+
+Developed by:
+
+**Charbel MAMLANKOU, Jamal ADETOLA & Wilfrid HOUEDANOU** .  
+Corresponding author: charbelzeusmamlankou@gmail.com
