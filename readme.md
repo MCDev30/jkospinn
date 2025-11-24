@@ -64,8 +64,8 @@ Typical experiments:
 - **EXP 2: Double-Well Process**  
   *Inferring parameter α and noise of a double-well potential*
 
-- **EXP 3: Multi-Initialization & robustness**  
-  *Multiple runs to assess stability and error distribution*
+- **EXP 3: Comparative analysis & robustness**  
+  *Comparison with alternative solvers*
 
 Each experiment generates performance summaries: relative errors for each parameter, convergence, loss curves, and visualizations.
 
